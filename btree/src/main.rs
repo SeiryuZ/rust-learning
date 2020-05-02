@@ -93,6 +93,37 @@ impl <T: Ord + Clone > Tree<T> {
             }
         }
     }
+
+    pub fn search(&self, value: T) -> bool {
+        let mut current_node;
+        match self.root {
+            None => return false,
+            Some(ref root) => current_node = root
+        }
+
+        loop {
+
+            if current_node.value == value {
+                return true
+            }
+
+            if value < current_node.value {
+                match current_node.left {
+                    None => break,
+                    Some(ref node) => current_node = node,
+                }
+            }
+            else {
+                match current_node.right {
+                    None => break,
+                    Some(ref node) => current_node = node,
+                }
+            }
+
+        }
+        return false;
+    }
+
 }
 
 
@@ -156,5 +187,8 @@ fn main() {
     println!("In order: {:?}", tree.in_order_traversal());
     println!("Pre order: {:?}", tree.pre_order_traversal());
     println!("post order: {:?}", tree.post_order_traversal());
+
+    println!("Search 55: {:?}", tree.search(55));
+    println!("Search 34: {:?}", tree.search(34));
 
 }
