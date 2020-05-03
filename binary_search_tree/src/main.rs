@@ -1,5 +1,7 @@
+use std::fmt::Debug;
+
 #[derive(Debug)]
-struct Tree<T> {
+struct BinarySearchTree<T> {
     root: Option<Box<TreeNode<T>>>,
 }
 
@@ -10,7 +12,7 @@ struct TreeNode<T> {
     right: Option<Box<TreeNode<T>>>,
 }
 
-impl<T: Ord + Clone> Tree<T> {
+impl<T: Ord + Clone + Debug> BinarySearchTree<T> {
     pub fn new() -> Self {
         Self { root: None }
     }
@@ -121,9 +123,20 @@ impl<T: Ord + Clone> Tree<T> {
         }
         return false;
     }
+
+    pub fn delete(&mut self, value: T) -> bool {
+        match self.root {
+            None => return false,
+            Some(ref mut root) => {
+                let result = root.delete(value);
+                println!("DELETEEEEE {}", result);
+                return result;
+            }
+        }
+    }
 }
 
-impl<T: Clone> TreeNode<T> {
+impl<T: Ord + Clone + Debug> TreeNode<T> {
     pub fn traverse_in_order(&self) -> Vec<T> {
         let mut result = Vec::<T>::new();
 
@@ -180,10 +193,83 @@ impl<T: Clone> TreeNode<T> {
 
         return result;
     }
+
+    pub fn is_leaf(&self) -> bool {
+        if self.right.is_none() && self.left.is_none() {
+            return true;
+        }
+        return false;
+    }
+
+    pub fn delete(&mut self, value: T) -> bool {
+        if self.left.is_none() && self.right.is_none() {
+            println!("LEAF: NOT FOUND");
+            return false;
+        }
+
+        let mut next_node: &mut Option<Box<TreeNode<T>>>;
+        if value < self.value {
+            next_node = &mut self.left
+        } else {
+            next_node = &mut self.right
+        }
+
+        match &mut next_node {
+            None => return false,
+            Some(ref mut node) => {
+                if node.value != value {
+                    println!("MOVING TO: {:?}", node);
+                    return node.delete(value);
+                }
+
+                if node.is_leaf() {
+                    *next_node = None;
+                    println!("IT IS LEAF, SAFE TO DELETE");
+                    return true;
+                } else {
+                    // Only one child
+                    if node.left.is_some() && node.right.is_none() {
+                        node.value = node.left.as_ref().unwrap().value.clone();
+                        node.left = None;
+                        return true;
+                    } else if node.right.is_some() && node.left.is_none() {
+                        node.value = node.right.as_ref().unwrap().value.clone();
+                        node.right = None;
+                        return true;
+                    }
+
+                    // the fun part, where both child exists. Get the max on the left node
+                    let mut max_node = node.left.as_mut().unwrap();
+                    let max_value: T;
+                    loop {
+                        match max_node.right {
+                            None => {
+                                max_value = max_node.value.clone();
+                                // TODO: fix this bug!
+                                node.left = None;
+                                break
+                            },
+                            Some(ref mut potential_max_node) => {
+                                if potential_max_node.right.is_none() {
+                                    max_value = potential_max_node.value.clone();
+                                    max_node.right = None;
+                                    break
+                                }
+                            }
+                        }
+                    }
+                    println!("here {:?}", max_value);
+                    node.value = max_value;
+                    return true;
+                }
+
+            }
+        }
+    }
 }
 
 fn main() {
-    let mut tree = Tree::<i32>::new();
+    let mut tree = BinarySearchTree::<i32>::new();
 
     tree.insert(30);
     tree.insert(20);
@@ -192,6 +278,9 @@ fn main() {
     tree.insert(34);
     tree.insert(23);
     tree.insert(60);
+    tree.insert(65);
+
+    tree.delete(51);
 
     println!("");
     println!("{:?}", tree);
@@ -202,4 +291,32 @@ fn main() {
 
     println!("Search 55: {:?}", tree.search(55));
     println!("Search 34: {:?}", tree.search(34));
+
+    
+    println!("");
+    println!("");
+
+
+    let mut tree = BinarySearchTree::<String>::new();
+
+    tree.insert("apa".to_string());
+    tree.insert("kabar".to_string());
+    tree.insert("darimana".to_string());
+    tree.insert("test".to_string());
+    tree.insert("saiko".to_string());
+    tree.insert("last".to_string());
+    tree.insert("dor".to_string());
+    tree.insert("password".to_string());
+
+    tree.delete("test".to_string());
+
+    println!("");
+    println!("{:?}", tree);
+    println!("");
+    println!("In order: {:?}", tree.in_order_traversal());
+    println!("Pre order: {:?}", tree.pre_order_traversal());
+    println!("post order: {:?}", tree.post_order_traversal());
+
+    println!("Search 55: {:?}", tree.search("APA".to_string()));
+    println!("Search 34: {:?}", tree.search("dor".to_string()));
 }
