@@ -1,4 +1,3 @@
-
 #[derive(Debug)]
 struct Tree<T> {
     root: Option<Box<TreeNode<T>>>,
@@ -11,32 +10,29 @@ struct TreeNode<T> {
     right: Option<Box<TreeNode<T>>>,
 }
 
-
-impl <T: Ord + Clone > Tree<T> {
-
+impl<T: Ord + Clone> Tree<T> {
     pub fn new() -> Self {
-        Self{root: None}
+        Self { root: None }
     }
 
-    pub fn in_order_traversal(&self) -> Vec<T>{
+    pub fn in_order_traversal(&self) -> Vec<T> {
         match self.root {
             None => return Vec::<T>::new(),
             Some(ref node) => node.traverse_in_order(),
         }
     }
-    pub fn pre_order_traversal(&self) -> Vec<T>{
+    pub fn pre_order_traversal(&self) -> Vec<T> {
         match self.root {
             None => return Vec::<T>::new(),
             Some(ref node) => node.traverse_pre_order(),
         }
     }
-    pub fn post_order_traversal(&self) -> Vec<T>{
+    pub fn post_order_traversal(&self) -> Vec<T> {
         match self.root {
             None => return Vec::<T>::new(),
             Some(ref node) => node.traverse_post_order(),
         }
     }
-
 
     pub fn insert(&mut self, value: T) -> bool {
         /*
@@ -48,46 +44,51 @@ impl <T: Ord + Clone > Tree<T> {
         let mut current_node;
         match self.root {
             None => {
-                self.root = Some(Box::new(TreeNode::<T>{value: value, left: None, right: None}));
-                return true
-            },
-            Some(ref mut root) => {
-               current_node = root
+                self.root = Some(Box::new(TreeNode::<T> {
+                    value: value,
+                    left: None,
+                    right: None,
+                }));
+                return true;
             }
+            Some(ref mut root) => current_node = root,
         }
 
         loop {
-
             if current_node.value == value {
-                return false
+                return false;
             }
 
-
             if value < current_node.value {
-
                 match current_node.left {
                     None => {
-                        current_node.left = Some(Box::new(TreeNode::<T>{value: value, left: None, right: None}));
-                        return true
-                    },
+                        current_node.left = Some(Box::new(TreeNode::<T> {
+                            value: value,
+                            left: None,
+                            right: None,
+                        }));
+                        return true;
+                    }
                     Some(ref mut node) => {
                         current_node = node;
-                        continue
+                        continue;
                     }
                 }
             }
 
-            
             if value > current_node.value {
-
                 match current_node.right {
                     None => {
-                        current_node.right = Some(Box::new(TreeNode::<T>{value: value, left: None, right: None}));
-                        return true
-                    },
+                        current_node.right = Some(Box::new(TreeNode::<T> {
+                            value: value,
+                            left: None,
+                            right: None,
+                        }));
+                        return true;
+                    }
                     Some(ref mut node) => {
                         current_node = node;
-                        continue
+                        continue;
                     }
                 }
             }
@@ -98,13 +99,12 @@ impl <T: Ord + Clone > Tree<T> {
         let mut current_node;
         match self.root {
             None => return false,
-            Some(ref root) => current_node = root
+            Some(ref root) => current_node = root,
         }
 
         loop {
-
             if current_node.value == value {
-                return true
+                return true;
             }
 
             if value < current_node.value {
@@ -112,28 +112,29 @@ impl <T: Ord + Clone > Tree<T> {
                     None => break,
                     Some(ref node) => current_node = node,
                 }
-            }
-            else {
+            } else {
                 match current_node.right {
                     None => break,
                     Some(ref node) => current_node = node,
                 }
             }
-
         }
         return false;
     }
-
 }
 
-
-impl <T: Clone> TreeNode<T> {
-
+impl<T: Clone> TreeNode<T> {
     pub fn traverse_in_order(&self) -> Vec<T> {
         let mut result = Vec::<T>::new();
 
-        let mut left = self.left.as_ref().map_or(vec![], |left| left.traverse_in_order());
-        let mut right = self.right.as_ref().map_or(vec![], |right| right.traverse_in_order());
+        let mut left = self
+            .left
+            .as_ref()
+            .map_or(vec![], |left| left.traverse_in_order());
+        let mut right = self
+            .right
+            .as_ref()
+            .map_or(vec![], |right| right.traverse_in_order());
 
         result.append(&mut left);
         result.push(self.value.clone());
@@ -145,8 +146,14 @@ impl <T: Clone> TreeNode<T> {
     pub fn traverse_pre_order(&self) -> Vec<T> {
         let mut result = Vec::<T>::new();
 
-        let mut left = self.left.as_ref().map_or(vec![], |left| left.traverse_in_order());
-        let mut right = self.right.as_ref().map_or(vec![], |right| right.traverse_in_order());
+        let mut left = self
+            .left
+            .as_ref()
+            .map_or(vec![], |left| left.traverse_in_order());
+        let mut right = self
+            .right
+            .as_ref()
+            .map_or(vec![], |right| right.traverse_in_order());
 
         result.push(self.value.clone());
         result.append(&mut left);
@@ -158,8 +165,14 @@ impl <T: Clone> TreeNode<T> {
     pub fn traverse_post_order(&self) -> Vec<T> {
         let mut result = Vec::<T>::new();
 
-        let mut left = self.left.as_ref().map_or(vec![], |left| left.traverse_in_order());
-        let mut right = self.right.as_ref().map_or(vec![], |right| right.traverse_in_order());
+        let mut left = self
+            .left
+            .as_ref()
+            .map_or(vec![], |left| left.traverse_in_order());
+        let mut right = self
+            .right
+            .as_ref()
+            .map_or(vec![], |right| right.traverse_in_order());
 
         result.append(&mut left);
         result.append(&mut right);
@@ -168,7 +181,6 @@ impl <T: Clone> TreeNode<T> {
         return result;
     }
 }
-
 
 fn main() {
     let mut tree = Tree::<i32>::new();
@@ -190,5 +202,4 @@ fn main() {
 
     println!("Search 55: {:?}", tree.search(55));
     println!("Search 34: {:?}", tree.search(34));
-
 }
